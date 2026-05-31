@@ -9,7 +9,7 @@
   --navy:#003087;--navy2:#00215c;--navy3:#001a4a;
   --gold:#f5c400;--gold2:#ffd740;
   --green:#16a34a;--green-bg:#dcfce7;
-  --red:#dc2626;--red-bg:#fee2e2;
+  --red:#dc2626;--red-bg:#fee2e2;h
   --border:#e2e8f0;--bg:#f1f5f9;--white:#fff;
   --text:#0f172a;--text2:#334155;--text3:#64748b;
   --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.10);--shadow-md:0 4px 12px rgba(0,0,0,.10);
@@ -669,7 +669,7 @@ function actualizarReloj(){
   actualizarJornada();
 }
 actualizarReloj();
-setInterval(actualizarReloj, 1000);
+setInterval(actualizarReloj, 1000); setInterval(function(){ cargarRegistros(); }, 30000);
 
 function actualizarJornada(){
   var el = document.getElementById('jornadaInfo');
