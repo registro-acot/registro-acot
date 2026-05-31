@@ -983,7 +983,7 @@ async function confirmarCancelacion(){
     await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({accion:'cancelar', id:registros[cancelandoIdx].id||registros[cancelandoIdx].nroDoc, motivo:motivo, fechaCancelacion:registros[cancelandoIdx].fechaCancelacion})});
   } catch(e){}
-  cerrarModal(); renderTabla(); actualizarStats(); showToast('🚫 Registro cancelado');
+      cerrarModal(); showToast('🚫 Registro cancelado'); setTimeout(cargarRegistros, 1500);
 }
 
 // ═══════════════ EXCEL ═══════════════
