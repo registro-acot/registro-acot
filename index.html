@@ -729,7 +729,7 @@ async function guardarRegistro(){
   setBtnLoading(true);
   var data = Object.assign({accion:'agregar', timestamp:new Date().toISOString(), estado:'Privado de libertad', motivoCancelacion:''}, campos);
   try{
-    await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', body:new URLSearchParams(data))});
+    await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', body:new URLSearchParams(data)});
     var local = JSON.parse(localStorage.getItem('extranjeros_pdi') || '[]'); setTimeout(cargarRegistros, 3000);
     local.push(Object.assign({}, data, {id:campos.nroDoc}));
     localStorage.setItem('extranjeros_pdi', JSON.stringify(local));
@@ -1111,7 +1111,7 @@ async function enviarExcel(){
       funcionario:r.funcionario, unidad:r.unidad, telefono:r.telefono,
       estado:'Privado de libertad', motivoCancelacion:''};
     try{
-      await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', body:new URLSearchParams(data))});
+      await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', body:new URLSearchParams(data)});
       var local = JSON.parse(localStorage.getItem('extranjeros_pdi') || '[]'); setTimeout(cargarRegistros, 3000);
       local.push(Object.assign({}, data, {id:r.nroDoc}));
       localStorage.setItem('extranjeros_pdi', JSON.stringify(local));
