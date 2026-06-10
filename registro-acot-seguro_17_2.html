@@ -561,11 +561,11 @@ function intentarLogin(){
   var user = uEl ? uEl.value.trim().toLowerCase() : '';
   var pass = pEl ? pEl.value : '';
   if(!user || !pass){ mostrarLoginError('Ingresa usuario y contraseña.'); return; }
-  var valido = (user === 'acotseminario1' && pass === 'Acot2024');
+  var valido = (user === 'acotseminario1' && pass === 'Acot2024') || (user === 'acotseminario2' && pass === 'Acot2025');
   if(valido){
     loginAttempts = 0;
     blockUntil = 0;
-    try{ sessionStorage.setItem('sesion_acot', JSON.stringify({usuario:user,expira:Date.now()+(SESSION_HOURS*3600*1000)})); //, JSON.stringify({usuario:user, expira:Date.now()+(SESSION_HOURS*3600*1000)})); }catch(e){}
+    try{ sessionStorage.setItem('sesion_acot', JSON.stringify({usuario:user, expira:Date.now()+(SESSION_HOURS*3600*1000)})); }catch(e){}
     var ls = document.getElementById('loginScreen');
     if(ls){ ls.style.cssText = 'display:none!important'; }
     cargarRegistros();
@@ -592,7 +592,7 @@ window.addEventListener('load', function(){
   if(uEl) uEl.addEventListener('keydown', function(e){ if(e.key==='Enter') intentarLogin(); });
   // Check existing session
   try{
-    var s = JSON.parse(null || 'null');
+    var s = JSON.parse(sessionStorage.getItem('sesion_acot') || 'null');
     if(s && Date.now() < s.expira){
       var ls = document.getElementById('loginScreen');
       if(ls) ls.style.cssText = 'display:none!important';
@@ -659,7 +659,7 @@ function actualizarReloj(){
   actualizarJornada();
 }
 actualizarReloj();
-setInterval(actualizarReloj, 1000);  setInterval(cargarRegistros, 30000);
+setInterval(actualizarReloj, 1000);
 
 function actualizarJornada(){
   var el = document.getElementById('jornadaInfo');
@@ -731,7 +731,7 @@ async function guardarRegistro(){
   var data = Object.assign({accion:'agregar', timestamp:new Date().toISOString(), estado:'Privado de libertad', motivoCancelacion:''}, campos);
   try{
     await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-    var local = JSON.parse(localStorage.getItem('extranjeros_pdi') || []);
+    var local = JSON.parse(localStorage.getItem('extranjeros_pdi') || '[]');
     local.push(Object.assign({}, data, {id:campos.nroDoc}));
     localStorage.setItem('extranjeros_pdi', JSON.stringify(local));
     limpiarFormulario();
@@ -768,7 +768,7 @@ function mostrarError(msg){
 // ═══════════════ CARGAR ═══════════════
 function cargarRegistros(){
   try{
-    var s = JSON.parse(null || 'null');
+    var s = JSON.parse(sessionStorage.getItem('sesion_acot') || 'null');
     if(!s || Date.now() > s.expira) return;
   } catch(e){ return; }
 
@@ -779,7 +779,7 @@ function cargarRegistros(){
   var tout = setTimeout(function(){
     delete window[cbName];
     try{ document.body.removeChild(sc); } catch(e){}
-    registros = JSON.parse(localStorage.getItem('extranjeros_pdi') || []);
+    registros = JSON.parse(localStorage.getItem('extranjeros_pdi') || '[]');
     renderTabla(); actualizarStats();
     if(btnAct){ btnAct.disabled = false; btnAct.textContent = '🔄 Actualizar'; }
   }, 8000);
@@ -793,7 +793,7 @@ function cargarRegistros(){
   sc.onerror = function(){
     clearTimeout(tout); delete window[cbName];
     try{ document.body.removeChild(sc); } catch(e){}
-    registros = JSON.parse(localStorage.getItem('extranjeros_pdi') || []);
+    registros = JSON.parse(localStorage.getItem('extranjeros_pdi') || '[]');
     renderTabla(); actualizarStats();
     if(btnAct){ btnAct.disabled = false; btnAct.textContent = '🔄 Actualizar'; }
   };
@@ -1113,7 +1113,7 @@ async function enviarExcel(){
       estado:'Privado de libertad', motivoCancelacion:''};
     try{
       await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-      var local = JSON.parse(localStorage.getItem('extranjeros_pdi') || []);
+      var local = JSON.parse(localStorage.getItem('extranjeros_pdi') || '[]');
       local.push(Object.assign({}, data, {id:r.nroDoc}));
       localStorage.setItem('extranjeros_pdi', JSON.stringify(local));
       enviados++;
