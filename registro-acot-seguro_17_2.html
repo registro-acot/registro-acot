@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDI – Registro de Extranjeros</title>
 <style>
@@ -565,7 +565,7 @@ function intentarLogin(){
   if(valido){
     loginAttempts = 0;
     blockUntil = 0;
-    try{ sessionStorage.setItem('sesion_acot', JSON.stringify({usuario:user, expira:Date.now()+(SESSION_HOURS*3600*1000)})); }catch(e){}
+    try{ window._sesionActiva = true; //, JSON.stringify({usuario:user, expira:Date.now()+(SESSION_HOURS*3600*1000)})); }catch(e){}
     var ls = document.getElementById('loginScreen');
     if(ls){ ls.style.cssText = 'display:none!important'; }
     cargarRegistros();
@@ -592,7 +592,7 @@ window.addEventListener('load', function(){
   if(uEl) uEl.addEventListener('keydown', function(e){ if(e.key==='Enter') intentarLogin(); });
   // Check existing session
   try{
-    var s = JSON.parse(sessionStorage.getItem('sesion_acot') || 'null');
+    var s = JSON.parse(null || 'null');
     if(s && Date.now() < s.expira){
       var ls = document.getElementById('loginScreen');
       if(ls) ls.style.cssText = 'display:none!important';
@@ -768,7 +768,7 @@ function mostrarError(msg){
 // ═══════════════ CARGAR ═══════════════
 function cargarRegistros(){
   try{
-    var s = JSON.parse(sessionStorage.getItem('sesion_acot') || 'null');
+    var s = JSON.parse(null || 'null');
     if(!s || Date.now() > s.expira) return;
   } catch(e){ return; }
 
