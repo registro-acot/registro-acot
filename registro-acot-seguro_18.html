@@ -683,7 +683,7 @@ function switchTab(tab, btn){
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
   btn.classList.add('active');
-  if(tab === 'lista' || tab === 'reporte') ();
+  if(tab === 'lista' || tab === 'reporte') cargarRegistros();
 }
 
 function setSubtab(sub, btn){
@@ -736,7 +736,7 @@ async function guardarRegistro(){
     localStorage.setItem('extranjeros_pdi', JSON.stringify(local));
     limpiarFormulario();
     showToast('✅ Registro guardado — sincronizando...');
-    setTimeout(function(){ (); showToast('✅ Registro guardado y sincronizado'); }, 2500);
+    setTimeout(function(){ cargarRegistros(); showToast('✅ Registro guardado y sincronizado'); }, 2500);
   } catch(e){ showToast('❌ Error al guardar.', true); }
   finally{ setBtnLoading(false); }
 }
