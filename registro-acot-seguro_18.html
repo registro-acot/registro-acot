@@ -56,8 +56,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .dash-card.verde::before{background:var(--green);}
 .dash-card.cancelado{background:rgba(100,116,139,.15);border-color:rgba(100,116,139,.3);}
 .dash-card.cancelado::before{background:#64748b;}
-.dash-card.total{background:rgba(245,196,0,.10);border-color:rgba(245,196,0,.25);}
-.dash-card.total::before{background:var(--gold);}
+.dash-card.total{background:rgba(245,196,0,.18);border-color:rgba(245,196,0,.55);box-shadow:0 0 18px rgba(245,196,0,.22),inset 0 0 30px rgba(245,196,0,.07);transform:scale(1.035);}
+.dash-card.total::before{background:var(--gold);height:4px;}
 .dash-icon{font-size:22px;line-height:1;}
 .dash-top{display:flex;justify-content:space-between;align-items:flex-start;}
 .dash-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.55);}
@@ -69,6 +69,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .nac-wrap{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;}
 .nac-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(245,196,0,.15);border:1px solid rgba(245,196,0,.25);color:var(--gold2);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600;}
 .nac-count{background:rgba(245,196,0,.25);border-radius:10px;padding:1px 5px;font-size:10px;font-weight:700;}
+.dash-fuera{margin-top:7px;padding-top:6px;border-top:1px solid rgba(220,38,38,.25);}
+.dash-fuera-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(220,38,38,.8);margin-bottom:4px;}
+.dash-fuera-items{display:flex;flex-wrap:wrap;gap:3px;}
+.dash-fuera-item{display:inline-flex;align-items:center;gap:3px;background:rgba(220,38,38,.18);border:1px solid rgba(220,38,38,.3);color:#fca5a5;border-radius:12px;padding:1px 7px;font-size:10px;font-weight:600;}
+.dash-fuera-num{background:rgba(220,38,38,.35);border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700;}
 
 /* MAIN */
 .main{max-width:1200px;margin:0 auto;padding:1.5rem 2rem;}
@@ -278,7 +283,11 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="dash-card verde">
       <div class="dash-top"><span class="dash-label">Privados de libertad</span><span class="dash-icon">🟢</span></div>
       <div class="dash-value" id="dVerde">0</div>
-      <div class="dash-sub">Dentro del plazo de permanencia</div>
+      <div class="dash-sub" id="dVerdeTotal"></div>
+      <div id="dFueraPlazo" class="dash-fuera" style="display:none;">
+        <div class="dash-fuera-title">⚠️ Fuera de plazo</div>
+        <div class="dash-fuera-items" id="dFueraPlazoItems"></div>
+      </div>
     </div>
     <div class="dash-card cancelado">
       <div class="dash-top"><span class="dash-label">Cancelados</span><span class="dash-icon">⚫</span></div>
@@ -835,11 +844,27 @@ function renderNacResumen(){
 // ═══════════════ STATS ═══════════════
 function actualizarStats(){
   var activos = registros.filter(function(r){ return r.estado !== 'Cancelado'; });
-  var verde = activos.filter(function(r){ return calcDias(r.fechaIngreso) <= 4; }).length;
+  var dentroPlazo = activos.filter(function(r){ return calcDias(r.fechaIngreso) <= 4; });
+  var fueraPlazo = activos.filter(function(r){ return calcDias(r.fechaIngreso) > 4; });
   var cancelados = registros.filter(function(r){ return r.estado === 'Cancelado'; }).length;
-  document.getElementById('dVerde').textContent = verde;
+  document.getElementById('dVerde').textContent = activos.length;
   document.getElementById('dCancelados').textContent = cancelados;
   document.getElementById('dTotal').textContent = registros.length;
+  var subEl = document.getElementById('dVerdeTotal');
+  if(subEl) subEl.textContent = 'Dentro del plazo: ' + dentroPlazo.length + (fueraPlazo.length > 0 ? '  •  Fuera: ' + fueraPlazo.length : '');
+  var fueraEl = document.getElementById('dFueraPlazo');
+  var fueraItemsEl = document.getElementById('dFueraPlazoItems');
+  if(fueraEl && fueraItemsEl){
+    if(fueraPlazo.length > 0){
+      var nacFuera = {};
+      fueraPlazo.forEach(function(r){ var n = (r.nacionalidad || 'Sin datos').trim(); nacFuera[n] = (nacFuera[n] || 0) + 1; });
+      var sortedFuera = Object.entries(nacFuera).sort(function(a,b){ return b[1]-a[1]; });
+      fueraItemsEl.innerHTML = sortedFuera.map(function(x){ return '<span class="dash-fuera-item">' + x[0] + '<span class="dash-fuera-num">' + x[1] + '</span></span>'; }).join('');
+      fueraEl.style.display = 'block';
+    } else {
+      fueraEl.style.display = 'none';
+    }
+  }
   var nacCount = {};
   activos.forEach(function(r){ var n = (r.nacionalidad || 'Sin datos').trim(); nacCount[n] = (nacCount[n] || 0) + 1; });
   var sorted = Object.entries(nacCount).sort(function(a,b){ return b[1]-a[1]; });
